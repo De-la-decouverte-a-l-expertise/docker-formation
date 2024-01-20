@@ -1,17 +1,59 @@
+# Install docker SWARM
+deploy_swarm = ENV['DEPLOY_SWARM'] || false
+
+#Managers 
+manager_ip = "192.168.2.2"
+
+#Workers 
+numworkers = 2
+instances = []
+(1..numworkers).each do |n| 
+  instances.push({:name => "worker#{n}", :ip => "192.168.3.#{n+2}"})
+end
+
+#Cluster IP
+File.open("./hosts", 'w') { |file| 
+    file.write("#{manager_ip} manager manager.deladecouvertealexpertise.fr\n")
+    instances.each do |i|
+        file.write("#{i[:ip]} #{i[:name]} #{i[:name]}.deladecouvertealexpertise.fr\n")
+    end
+}
+
+
 Vagrant.configure("2") do |config|
     
-    #Definir le nom de la machine dans vagrant. Replace default
-    config.vm.define "formation-docker-1"
-    
-    #Definir le provider 
-    config.vm.provider "virtualbox" do |v|
-        #Definir le nom de la VM dans le provider en remplacement de celui par defaut
-        v.name = "formation-docker-1"
-    end
+    #Création du Manager
+    config.vm.define "manager" do |i|
+        i.vm.box = "hashicorp/bionic64"
+        i.vm.hostname = "manager"
+        i.vm.network "private_network", ip: "#{manager_ip}"
+        if File.file?("./hosts") 
+          i.vm.provision "file", source: "hosts", destination: "/tmp/hosts"
+          i.vm.provision "shell", inline: "cat /tmp/hosts >> /etc/hosts", privileged: true
+        end 
+        if deploy_swarm 
+          i.vm.provision "shell", inline: "docker swarm init --advertise-addr #{manager_ip}"
+          i.vm.provision "shell", inline: "docker swarm join-token -q worker > /vagrant/token"
+        end
+    end 
 
-    #Definir le hostname de la VM
-    config.vm.hostname = "formation-docker-1"
-    
-    config.vm.box = "hashicorp/bionic64"
+    #Création des workers 
+    instances.each do |instance| 
+        config.vm.define instance[:name] do |i|
+            i.vm.box = "hashicorp/bionic64"
+            i.vm.hostname = instance[:name]
+            i.vm.network "private_network", ip: "#{instance[:ip]}"
+            config.vm.provision "docker" do |d|
+                d.pull_images "nginx"
+            end
+            if File.file?("./hosts") 
+                i.vm.provision "file", source: "hosts", destination: "/tmp/hosts"
+                i.vm.provision "shell", inline: "cat /tmp/hosts >> /etc/hosts", privileged: true
+            end 
+            if deploy_swarm
+                i.vm.provision "shell", inline: "docker swarm join --advertise-addr #{instance[:ip]} --listen-addr #{instance[:ip]}:2377 --token `cat /vagrant/token` #{manager_ip}:2377"
+            end
+        end 
+    end
 
 end
