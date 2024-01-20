@@ -1,5 +1,14 @@
 # Registry harbord
-Dans cette configuration Vagrant,vous allez pouvoir déployer une VM dans laquelle on aura préinstallé un moteur Docker. 
+Dans cette configuration Vagrant,vous allez pouvoir déployer une VM dans laquelle on aura préinstallé un moteur Docker.
+```bash 
+cd TP/2_registry_harbor
+vagrant up
+vagrant ssh formation-docker
+```
+Il faudra passer en root
+```bash 
+sudo su - root
+```
 
 Pour vous aider, on aura aussi récupéré les sources (offline) du regsitre harbor qu'on aura stocké dans /opt
 ```bash 
@@ -14,4 +23,5 @@ Une fois le fichier de configuration modifié, il ne vous reste plus qu'à lance
 ./install.sh --with-trivy
 ```
 #Please do NOT set --with-chartmuseum, as chartmusuem has been deprecated and removed.
+
 #Please do NOT set --with-notary, as notary has been deprecated and removed.
