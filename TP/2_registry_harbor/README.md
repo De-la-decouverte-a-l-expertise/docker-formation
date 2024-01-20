@@ -18,7 +18,7 @@ Nous aurons aussi positionné un fichier de conf qu'il faudra personnaliser en f
 ```bash 
 vi harbor.yaml
 ```
-Une fois le fichier de configuration modifié, il ne vous reste plus qu'à lancer le script d'installation avec les bons paramaètres. Exemple 
+Une fois le fichier de configuration modifié, il ne vous reste plus qu'à lancer le script d'installation avec les bons paramaètres(voir documentation). Exemple 
 ```bash 
 ./install.sh --with-trivy
 ```
