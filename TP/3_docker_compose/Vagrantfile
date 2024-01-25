@@ -6,16 +6,16 @@ Vagrant.configure("2") do |config|
     config.vm.network "forwarded_port", guest: 8080, host: 8080
     
     #Definir le nom de la machine dans vagrant. Replace default
-    config.vm.define "formation-docker-1"
+    config.vm.define "formation-docker"
     
     #Definir le provider 
     config.vm.provider "virtualbox" do |v|
         #Definir le nom de la VM dans le provider en remplacement de celui par defaut
-        v.name = "formation-docker-1"
+        v.name = "formation-docker"
     end
 
     #Definir le hostname de la VM
-    config.vm.hostname = "formation-docker-1"
+    config.vm.hostname = "formation-docker"
     
     config.vm.box = "hashicorp/bionic64"
 

@@ -1,2 +1,2 @@
-# docker-formation
+# docker-compose
 Repo de formation Docker
